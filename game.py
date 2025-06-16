@@ -43,7 +43,7 @@ class Game:
             if isinstance(sprite, Brick):
                 sprite.kill()
 
-        start_x = 0
+        start_x = (constants.SCREEN_WIDTH - num_cols * constants.BRICK_WIDTH) // 2
         start_y = 50
 
         if layout_type == "rectangle":
