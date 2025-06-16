@@ -1,5 +1,4 @@
 import pygame
-import random
 from brick import Brick
 from ball import Ball
 from paddle import Paddle
@@ -101,10 +100,10 @@ class Game:
                 # Hitting the center results in vertical bounce, hitting edges causes more horizontal bounce
                 ball_center_x = self.ball.rect.centerx
                 paddle_center_x = self.paddle.rect.centerx
-                # Normalize hit position to [-1, 1] relative to paddle width
-                hit_position = (ball_center_x - paddle_center_x) / (constants.PADDLE_WIDTH / 2)
+                # Normalize hit position to [-2, 2] relative to paddle width
+                hit_position = (ball_center_x - paddle_center_x) / (constants.PADDLE_WIDTH / 4)
                 # Adjust ball's dx based on hit_position
-                self.ball.dx = hit_position * 2 # Max horizontal speed 5
+                self.ball.dx = hit_position * 2 # Max horizontal speed 2
 
         # Ball-brick collisions
         hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True) # True means remove brick
