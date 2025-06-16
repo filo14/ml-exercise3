@@ -83,9 +83,6 @@ class Game:
                     self.bricks.add(brick)
                     self.all_sprites.add(brick)
 
-        print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
-
-
     def handle_collisions(self):
         """Handles ball collisions with paddle and bricks."""
         # Ball-paddle collision
