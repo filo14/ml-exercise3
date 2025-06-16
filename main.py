@@ -1,6 +1,6 @@
 import pygame
 import constants
-from constants import ROWS_RECTANGLE, ROWS_PYRAMID, ROWS_SCATTERED
+from constants import ROWS_RECTANGLE, ROWS_PYRAMID, ROWS_INVERTED_PYRAMID
 from game import Game
 
 # --- Pygame Initialization ---
@@ -22,8 +22,8 @@ def main_game_loop():
         num_bricks_config = {"rows": ROWS_RECTANGLE, "cols": constants.BRICK_COLUMNS}
     elif constants.BRICK_LAYOUT == "pyramid":
         num_bricks_config = {"rows": ROWS_PYRAMID, "cols": constants.BRICK_COLUMNS}
-    elif constants.BRICK_LAYOUT == "scattered":
-        num_bricks_config = {"rows": ROWS_SCATTERED, "cols": constants.BRICK_COLUMNS}
+    elif constants.BRICK_LAYOUT == "inverted_pyramid":
+        num_bricks_config = {"rows": ROWS_INVERTED_PYRAMID, "cols": constants.BRICK_COLUMNS}
 
     print(f"Loading layout: {constants.BRICK_LAYOUT} with {num_bricks_config['rows']} rows, {num_bricks_config['cols']} cols")
     game.create_bricks_layout(

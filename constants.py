@@ -1,8 +1,8 @@
 # --- Game Constants ---
-BRICK_LAYOUT = "rectangle" # select from "rectangle" / "pyramid" / "scattered"
+BRICK_LAYOUT = "inverted_pyramid" # select from "rectangle" / "pyramid" / "scattered"
 ROWS_RECTANGLE = 3
 ROWS_PYRAMID = 3
-ROWS_SCATTERED = 3
+ROWS_INVERTED_PYRAMID = 3
 
 GAME_UNIT = 20
 PADDLE_WIDTH = GAME_UNIT * 5

@@ -67,16 +67,22 @@ class Game:
                     brick = Brick(x, y, color)
                     self.bricks.add(brick)
                     self.all_sprites.add(brick)
-        elif layout_type == "scattered":
-            num_bricks_to_place = constants.ROWS_SCATTERED * constants.BRICK_COLUMNS # Approximate number
-            for _ in range(num_bricks_to_place):
-                x = random.randint(0, constants.SCREEN_WIDTH - constants.BRICK_WIDTH)
-                y = random.randint(start_y, start_y + num_rows * constants.BRICK_HEIGHT)
-                color = random.choice(constants.BRICK_COLORS)
-                brick = Brick(x, y, color)
-                # Avoid overlapping too much if possible, for simplicity, we'll just place
-                self.bricks.add(brick)
-                self.all_sprites.add(brick)
+        elif layout_type == "inverted_pyramid":
+            for row in range(num_rows):
+                current_cols = row + 1
+                if current_cols > num_cols:
+                    current_cols = num_cols
+
+                row_width = current_cols * constants.BRICK_WIDTH
+                row_start_x = (constants.SCREEN_WIDTH - row_width) // 2
+
+                for col in range(current_cols):
+                    x = row_start_x + col * constants.BRICK_WIDTH
+                    y = start_y + row * constants.BRICK_HEIGHT
+                    color = constants.BRICK_COLORS[row % len(constants.BRICK_COLORS)]
+                    brick = Brick(x, y, color)
+                    self.bricks.add(brick)
+                    self.all_sprites.add(brick)
 
         print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
 
