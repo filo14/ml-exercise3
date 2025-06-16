@@ -1,8 +1,8 @@
 # --- Game Constants ---
-BRICK_LAYOUT = "rectangle" # select from "rectangle" / "pyramid" / "scattered"
+BRICK_LAYOUT = "inverted_pyramid" # select from "rectangle" / "pyramid" / "scattered"
 ROWS_RECTANGLE = 3
 ROWS_PYRAMID = 3
-ROWS_SCATTERED = 3
+ROWS_INVERTED_PYRAMID = 3
 
 GAME_UNIT = 20
 PADDLE_WIDTH = GAME_UNIT * 5
@@ -12,7 +12,7 @@ BRICK_DRAW_OFFSET = 5
 BRICK_COLUMNS = 3
 BRICK_WIDTH = GAME_UNIT * 3
 BRICK_HEIGHT = GAME_UNIT
-SCREEN_WIDTH = BRICK_COLUMNS * BRICK_WIDTH
+SCREEN_WIDTH = BRICK_COLUMNS * BRICK_WIDTH + GAME_UNIT * 3
 SCREEN_HEIGHT = GAME_UNIT * 15
 
 SCORE_PER_POINT = 1000
