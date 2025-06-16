@@ -51,7 +51,6 @@ class Game:
                 for col in range(num_cols):
                     x = start_x + col * constants.BRICK_WIDTH
                     y = start_y + row * constants.BRICK_HEIGHT
-                    print(x)
                     color = constants.BRICK_COLORS[row % len(constants.BRICK_COLORS)]
                     brick = Brick(x, y, color)
                     self.bricks.add(brick)
