@@ -1,9 +1,12 @@
+import sys
+
 import pygame
 import constants
 from game import Game
 from montecarlo import MonteCarloAgent
 import pickle
 import os
+
 
 def play_with_policy(agent, layout="rectangle", rows=3, cols=3, max_steps=2000):
     pygame.init()
@@ -34,17 +37,36 @@ def play_with_policy(agent, layout="rectangle", rows=3, cols=3, max_steps=2000):
 
     pygame.quit()
 
+
 if __name__ == "__main__":
     # Load a saved agent if you want, or retrain
+    layout_type = "inverted_pyramid"
+    if os.path.exists(f"pickle/mc_agent_{layout_type}.pkl"):
+        with open(f"pickle/mc_agent_{layout_type}.pkl", "rb") as f:
+            agent = pickle.load(f)
+    else:
+        print(f"No agent pickle file found. Please first run the train_{layout_type}.py file")
+        sys.exit()
 
-    try:
-        if os.path.exists("mc_agent.pkl"):
-            with open("mc_agent.pkl", "rb") as f:
-                agent = pickle.load(f)
-        else:
-            agent = MonteCarloAgent()
-            agent.run(num_episodes=500, layout=constants.BRICK_LAYOUT, rows=3, cols=constants.BRICK_COLUMNS)
-            with open("mc_agent.pkl", "wb") as f:
-                pickle.dump(agent, f)
-        play_with_policy(agent, layout=constants.BRICK_LAYOUT, rows=3, cols=constants.BRICK_COLUMNS)
-    except Exception as e: print(e)
+    play_with_policy(agent, layout=layout_type, rows=constants.ROWS_INVERTED_PYRAMID, cols=constants.BRICK_COLUMNS)
+
+    layout_type = "pyramid"
+    if os.path.exists(f"pickle/mc_agent_{layout_type}.pkl"):
+        with open(f"pickle/mc_agent_{layout_type}.pkl", "rb") as f:
+            agent = pickle.load(f)
+    else:
+        print(f"No agent pickle file found. Please first run the train_{layout_type}.py file")
+        sys.exit()
+
+    play_with_policy(agent, layout=layout_type, rows=constants.ROWS_INVERTED_PYRAMID, cols=constants.BRICK_COLUMNS)
+
+
+    layout_type = "rectangle"
+    if os.path.exists(f"pickle/mc_agent_{layout_type}.pkl"):
+        with open(f"pickle/mc_agent_{layout_type}.pkl", "rb") as f:
+            agent = pickle.load(f)
+    else:
+        print(f"No agent pickle file found. Please first run the train_{layout_type}.py file")
+        sys.exit()
+
+    play_with_policy(agent, layout=layout_type, rows=constants.ROWS_INVERTED_PYRAMID, cols=constants.BRICK_COLUMNS)
