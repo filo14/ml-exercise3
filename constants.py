@@ -1,5 +1,8 @@
 # --- Game Constants ---
 BRICK_LAYOUT = "inverted_pyramid" # select from "rectangle" / "pyramid" / "scattered"
+INVERTED_PYRAMID_LAYOUT = "inverted_pyramid"
+RECTANGLE_LAYOUT = "rectangle"
+PYRAMID_LAYOUT = "pyramid"
 ROWS_RECTANGLE = 3
 ROWS_PYRAMID = 3
 ROWS_INVERTED_PYRAMID = 3
@@ -21,3 +24,5 @@ BRICK_COLORS = [(255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0), (0, 0, 2
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (100, 100, 100)
+
+NUM_OF_EPISODES = 600
