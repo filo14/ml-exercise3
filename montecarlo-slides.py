@@ -1,11 +1,11 @@
 import random
-import pickle
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pygame
-import matplotlib.pyplot as plt
 
-from game import Game
 import constants
+from game import Game
 
 # Define possible paddle actions: -1 (left), 0 (stay), 1 (right)
 ACTIONS = [-1, 0, 1]
@@ -67,12 +67,12 @@ class MonteCarloAgent:
         best_actions = [a for a, v in action_values.items() if v == max_val]
         return random.choice(best_actions)
 
-    def generate_episode(self, screen, layout, rows, cols, max_steps=1000):
+    def generate_episode(self, screen, layout, rows, cols, max_steps=1000, ball_start_direction=0):
         """
         Generate an episode following current epsilon-soft policy.
         Returns a list of (state, action, reward)."""
         # Initialize game
-        game = Game(screen)
+        game = Game(screen, ball_start_direction=ball_start_direction)
         game.create_bricks_layout(layout, num_rows=rows, num_cols=cols)
 
         episode = []
@@ -107,7 +107,7 @@ class MonteCarloAgent:
 
         return episode, total_reward
 
-    def run(self, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100):
+    def run(self, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100, ball_start_direction=0):
         """
         Run Monte Carlo control for a number of episodes.
         """
@@ -117,7 +117,7 @@ class MonteCarloAgent:
         screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 
         for ep in range(1, num_episodes + 1):
-            episode, total_reward = self.generate_episode(screen, layout, rows, cols)
+            episode, total_reward = self.generate_episode(screen, layout, rows, cols, ball_start_direction=ball_start_direction)
             self.rewards_history.append(total_reward)
 
             # Keep track of first visits
@@ -154,56 +154,95 @@ class MonteCarloAgent:
         plt.xlabel('Episode')
         plt.ylabel('Total Reward')
         plt.title(f'MC Control learning ({layout})')
-        plt.savefig(f'imgs/mc_learning_{layout}.png')
+        plt.savefig(f'imgs/learning-curves/mc_learning_{layout}-trajectory_{ball_start_direction}.png')
         plt.show()
 
         pygame.quit()
         print("Training complete!")
 
+    def greedy_action(self, state):
+        """
+        Return the action with the highest Q-value for `state`.
+        Breaks ties at random.  Does *not* use ε.
+        """
+        self.initialize_state(state)          # make sure Q[state] exists
+        qs = self.Q[state]
+        max_val = max(qs.values())
+        best_actions = [a for a, v in qs.items() if v == max_val]
+        return random.choice(best_actions)
+
 # Example usage:
 if __name__ == "__main__":
     # 1) Train in‐memory
-    agent = MonteCarloAgent(epsilon=0.1)
-    agent.run(
-        num_episodes=constants.NUM_OF_EPISODES,
-        layout="rectangle",
-        rows=constants.ROWS_RECTANGLE,
-        cols=constants.BRICK_COLUMNS,
-        print_every=100
-    )
+    starting_states = [-2]
+    brick_layouts = [constants.INVERTED_PYRAMID_LAYOUT]
+    for brick_layout in brick_layouts:
 
-    # 2) Evaluate with actual rendering
-    pygame.init()
-    screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
-    pygame.display.set_caption("MC Agent Evaluation")
-    clock = pygame.time.Clock()
+        for starting_state in starting_states:
 
-    game = Game(screen)
-    game.create_bricks_layout(
-        constants.BRICK_LAYOUT,
-        num_rows=constants.ROWS_RECTANGLE,
-        num_cols=constants.BRICK_COLUMNS
-    )
-    # reset ball & paddle positions
-    game.ball.reset()
-    game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH)//2
+            agent = MonteCarloAgent(epsilon=0.1)
+            agent.run(
+                num_episodes=constants.NUM_OF_EPISODES,
+                layout=brick_layout,
+                rows=constants.ROWS_RECTANGLE,
+                cols=constants.BRICK_COLUMNS,
+                print_every=100,
+                ball_start_direction=starting_state
+            )
 
-    running = True
-    while running:
-        pygame.event.pump()  # allow window events (so it doesn’t “not responding”)
-        # 1) pick action by policy
-        state = agent.get_state(game)
-        action = agent.policy.get(state, agent.choose_action(state))
-        if action == -1:
-            game.paddle.move_left()
-        elif action == 1:
-            game.paddle.move_right()
-        # 2) step & draw
-        game.update()
-        game.draw()
-        clock.tick(60)
-        if game.game_over:
-            running = False
+            # # 2) Evaluate with actual rendering
+            pygame.init()
+            pygame.event.set_allowed(None)
+            screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+            pygame.display.set_caption("MC Agent Evaluation")
+            clock = pygame.time.Clock()
+
+            game = Game(screen, ball_start_direction=starting_state)
+            game.create_bricks_layout(
+                brick_layout,
+                num_rows=constants.ROWS_RECTANGLE,
+                num_cols=constants.BRICK_COLUMNS
+            )
+            # reset ball & paddle positions
+            game.ball.reset()
+            game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH)//2
+
+            ball_trail = []
+            running = True
+            while running:
+                pygame.event.pump()  # allow window events (so it doesn’t “not responding”)
+                # 1) pick action by policy
+                # state = agent.get_state(game)
+                # action = agent.policy.get(state, agent.choose_action(state))
+                agent.epsilon = 0
+                state = agent.get_state(game)
+                action = agent.policy.get(state, agent.choose_action(state))
+
+                if action == -1:
+                    game.paddle.move_left()
+                elif action == 1:
+                    game.paddle.move_right()
+                # 2) step & draw
+                game.update()
+                ball_trail.append(game.ball.rect.center)
+                game.draw()
+                # pygame.time.delay(30)
+
+                clock.tick(60)
+
+                if game.game_over:
+                    running = False
+
+            game.draw(ball_trail, True)
+
+            filename = f"imgs/trajectories/final_game_state_{brick_layout}_{starting_state}.png"
+
+            try:
+                # Get the entire display surface and save it
+                pygame.image.save(screen, filename)
+                print(f"Screenshot saved as {filename}")
+            except pygame.error as e:
+                print(f"Error saving screenshot: {e}")
 
     pygame.quit()
     print("Evaluation complete!")
