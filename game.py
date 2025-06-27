@@ -6,14 +6,18 @@ import constants
 
 class Game:
     """Manages the overall game state and logic."""
-    def __init__(self, screen):
+    def __init__(self, screen, ball_start_direction=None):
         """Initialize the game and set screen."""
         self.screen = screen
 
         self.all_sprites = pygame.sprite.Group()
         self.bricks = pygame.sprite.Group()
+        self.init_bricks = pygame.sprite.Group()
         self.paddle = Paddle()
-        self.ball = Ball()
+        if ball_start_direction != None:
+            self.ball = Ball(ball_start_direction)
+        else:
+            self.ball = Ball()
 
         self.all_sprites.add(self.paddle)
         self.all_sprites.add(self.ball)
@@ -53,6 +57,7 @@ class Game:
                     color = constants.BRICK_COLORS[row % len(constants.BRICK_COLORS)]
                     brick = Brick(x, y, color)
                     self.bricks.add(brick)
+                    self.init_bricks.add(Brick(x, y, color))
                     self.all_sprites.add(brick)
         elif layout_type == "pyramid":
             max_cols = num_cols
@@ -65,6 +70,7 @@ class Game:
                     color = constants.BRICK_COLORS[row % len(constants.BRICK_COLORS)]
                     brick = Brick(x, y, color)
                     self.bricks.add(brick)
+                    self.init_bricks.add(Brick(x, y, color))
                     self.all_sprites.add(brick)
         elif layout_type == "inverted_pyramid":
             for row in range(num_rows):
@@ -81,6 +87,7 @@ class Game:
                     color = constants.BRICK_COLORS[row % len(constants.BRICK_COLORS)]
                     brick = Brick(x, y, color)
                     self.bricks.add(brick)
+                    self.init_bricks.add(Brick(x, y, color))
                     self.all_sprites.add(brick)
 
         print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
@@ -155,9 +162,18 @@ class Game:
 
             print("You Win!")
 
-    def draw(self):
+    def draw(self, draw_trail=None, draw_hit_bricks=False):
         """Draws all game elements on the screen."""
         self.screen.fill(constants.BLACK) # Clear screen
+
+        if draw_hit_bricks:
+            self.init_bricks.draw(self.screen)
+
+        if draw_trail is not None:
+            for point in draw_trail:
+                ball_x, ball_y = point
+                pygame.draw.circle(self.screen, constants.RED, (int(ball_x), int(ball_y)), 1,0)
+
         self.all_sprites.draw(self.screen)
 
         # Display score and lives

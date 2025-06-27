@@ -4,19 +4,23 @@ import constants
 
 class Ball(pygame.sprite.Sprite):
     """Represents the ball."""
-    def __init__(self):
+    def __init__(self, dx=None):
         """Initialize the ball."""
         super().__init__()
         self.image = pygame.Surface([constants.BALL_RADIUS * 2, constants.BALL_RADIUS * 2], pygame.SRCALPHA)
         pygame.draw.circle(self.image, constants.WHITE, (constants.BALL_RADIUS, constants.BALL_RADIUS), constants.BALL_RADIUS)
         self.rect = self.image.get_rect()
         self.reset() # Initial position and velocity
+        self.dx = None
+        if dx == None:
+            self.dx = random.randint(-2, 2)  # Initial horizontal velocity
+        else:
+            self.dx = dx
 
     def reset(self):
         """Resets the ball to its starting position and velocity."""
         self.rect.x = constants.SCREEN_WIDTH // 2
         self.rect.y = constants.SCREEN_HEIGHT // 2
-        self.dx = random.randint(-2, 2) # Initial horizontal velocity
         self.dy = 3 # Initial vertical velocity (upwards)
         self.speed_multiplier = 1.0 # Can be increased for difficulty
         self.old_rect = self.rect.copy()

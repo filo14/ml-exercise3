@@ -40,9 +40,9 @@ class MonteCarloAgent:
                     (state, self.policy[state]), float('-inf')):
                 self.policy[state] = action
 
-    def play_episode(self, screen, layout="rectangle", rows=3, cols=3, max_steps=500):
+    def play_episode(self, screen, layout="rectangle", rows=3, cols=3, ball_start_direction=0, max_steps=500):
         # Set up game
-        game = Game(screen)
+        game = Game(screen, ball_start_direction=ball_start_direction)
         game.create_bricks_layout(layout, num_rows=rows, num_cols=cols)
         episode = []
         total_reward = 0
@@ -65,12 +65,12 @@ class MonteCarloAgent:
                 break
         return episode, total_reward
 
-    def run(self, num_episodes=1000, layout="rectangle", rows=3, cols=3, print_every=100):
+    def run(self, num_episodes=1000, layout="rectangle", rows=3, cols=3, ball_start_direction=0, print_every=100):
         # Pygame headless mode
         # pygame.display.iconify()  # Minimize window, you can also set dummy video driver
         screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
         for ep in range(num_episodes):
-            episode, total_reward = self.play_episode(screen, layout, rows, cols)
+            episode, total_reward = self.play_episode(screen, layout, rows, cols, ball_start_direction)
             G = 0
             visited = set()
             for (state, action, reward) in reversed(episode):
