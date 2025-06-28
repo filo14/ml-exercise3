@@ -21,7 +21,7 @@ class Ball(pygame.sprite.Sprite):
         if (dx is not None):
             self.dx = dx
         self.rect.x = self.screen_width // 2 - constants.BALL_RADIUS
-        self.rect.y = self.screen_height // 2 - constants.BALL_RADIUS
+        self.rect.y = self.screen_height // 2 + self.screen_height // 4 - constants.BALL_RADIUS
         self.dy = 1 # Initial vertical velocity (upwards)
         self.speed_multiplier = 1.0 # Can be increased for difficulty
         self.old_rect = self.rect.copy()
@@ -31,7 +31,7 @@ class Ball(pygame.sprite.Sprite):
         # if self.initial_dx is None:
         self.dx = random.randint(-2, 2)
         self.rect.x = self.screen_width // 2 - constants.BALL_RADIUS
-        self.rect.y = self.screen_height // 2 - constants.BALL_RADIUS
+        self.rect.y = self.screen_height // 2 + self.screen_height // 4 - constants.BALL_RADIUS
         self.dy = 1 # Initial vertical velocity (upwards)
         self.old_rect = self.rect.copy()
 

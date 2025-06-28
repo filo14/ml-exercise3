@@ -48,7 +48,7 @@ class Game:
                 sprite.kill()
 
         start_x = (self.screen_width - num_cols * constants.BRICK_WIDTH) // 2
-        start_y = 50
+        start_y = 2 * constants.GAME_UNIT
 
         if layout_type == "rectangle":
             for row in range(num_rows):

@@ -185,7 +185,7 @@ class MonteCarloAgent:
 
 def run_monte_carlo(num_episodes, layout, rows, cols, ball_start_direction, print_every):
     screen_width = cols * constants.BRICK_WIDTH + constants.GAME_UNIT * 3
-    screen_height = rows * constants.BRICK_HEIGHT * 4
+    screen_height = constants.GAME_UNIT * 8 + rows * constants.BRICK_HEIGHT * 2
     screen = pygame.display.set_mode((screen_width, screen_height))
 
     agent = MonteCarloAgent(epsilon=0.1)
