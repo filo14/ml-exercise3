@@ -35,9 +35,8 @@ class MonteCarloAgent:
         ball_bin_x = game.ball.rect.x // constants.GAME_UNIT
         ball_bin_y = game.ball.rect.y // constants.GAME_UNIT
         # Discretize ball direction
-        ball_dx = int(np.sign(game.ball.dx))  # -1, 0, 1
-        ball_dy = int(np.sign(game.ball.dy))  # -1, 1 (up/down)
-        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx, ball_dy
+        ball_dx = int( game.ball.dx) # -1, 0, 1
+        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx
 
     def initialize_state(self, state):
         """
@@ -107,7 +106,7 @@ class MonteCarloAgent:
 
         return episode, total_reward
 
-    def run(self, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100, ball_start_direction=0):
+    def run(self, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100, ball_start_direction=0, max_steps=1000):
         """
         Run Monte Carlo control for a number of episodes.
         """
@@ -117,8 +116,9 @@ class MonteCarloAgent:
         screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 
         for ep in range(1, num_episodes + 1):
-            episode, total_reward = self.generate_episode(screen, layout, rows, cols, ball_start_direction=ball_start_direction)
+            episode, total_reward = self.generate_episode(screen, layout, rows, cols, ball_start_direction=ball_start_direction, max_steps=max_steps)
             self.rewards_history.append(total_reward)
+            self.epsilon = max(self.epsilon * 0.995, 0.01)
 
             # Keep track of first visits
             visited = set()
@@ -142,19 +142,31 @@ class MonteCarloAgent:
                 best = random.choice(best_actions)
                 self.policy[state] = best
 
-            if ep % print_every == 0:
-                print(f"Episode {ep}/{num_episodes}, last reward: {total_reward}")
-
-        # Save trained agent
-        # with open(f"pickle/mc_agent_{layout}.pkl", "wb") as f:
-        #     pickle.dump(self, f)
+            # if ep % print_every == 0:
+            print(f"Episode {ep}/{num_episodes}, last reward: {total_reward}")
 
         # Plot learning curve
         plt.plot(self.rewards_history)
+        min_return = min(self.rewards_history)
+        plt.ylim(min_return, 0)  # bottom = worst episode, top = 0
         plt.xlabel('Episode')
         plt.ylabel('Total Reward')
         plt.title(f'MC Control learning ({layout})')
         plt.savefig(f'imgs/learning-curves/mc_learning_{layout}-trajectory_{ball_start_direction}.png')
+        plt.show()
+
+
+
+        rewards = np.array(self.rewards_history)
+        window = 100
+        running = np.convolve(rewards, np.ones(window) / window, mode='valid')
+        plt.scatter(range(len(rewards)), rewards, s=8, alpha=0.2)
+        plt.plot(range(window - 1, len(rewards)), running, color='orange', lw=2)
+        plt.ylim(min(rewards), 0)
+        plt.xlabel('Episode')
+        plt.ylabel('Total Reward')
+        plt.title(f'MC Control learning ({layout})')
+        plt.savefig(f'imgs/average-curves/mc_learning_{layout}-trajectory_{ball_start_direction}.png')
         plt.show()
 
         pygame.quit()
@@ -216,7 +228,7 @@ if __name__ == "__main__":
                 # action = agent.policy.get(state, agent.choose_action(state))
                 agent.epsilon = 0
                 state = agent.get_state(game)
-                action = agent.policy.get(state, agent.choose_action(state))
+                action = agent.greedy_action(state)
 
                 if action == -1:
                     game.paddle.move_left()

@@ -90,7 +90,7 @@ class Game:
                     self.init_bricks.add(Brick(x, y, color))
                     self.all_sprites.add(brick)
 
-        print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
+        # print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
 
 
     def handle_collisions(self):
