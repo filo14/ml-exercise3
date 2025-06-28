@@ -21,7 +21,7 @@ class Ball(pygame.sprite.Sprite):
         """Resets the ball to its starting position and velocity."""
         self.rect.x = constants.SCREEN_WIDTH // 2
         self.rect.y = constants.SCREEN_HEIGHT // 2
-        self.dy = 3 # Initial vertical velocity (upwards)
+        self.dy = 1 # Initial vertical velocity (upwards)
         self.speed_multiplier = 1.0 # Can be increased for difficulty
         self.old_rect = self.rect.copy()
 
