@@ -4,9 +4,11 @@ import constants
 
 class Ball(pygame.sprite.Sprite):
     """Represents the ball."""
-    def __init__(self):
+    def __init__(self, screen_width, screen_height):
         """Initialize the ball."""
         super().__init__()
+        self.screen_width = screen_width
+        self.screen_height = screen_height
         self.image = pygame.Surface([constants.BALL_RADIUS * 2, constants.BALL_RADIUS * 2], pygame.SRCALPHA)
         pygame.draw.circle(self.image, constants.WHITE, (constants.BALL_RADIUS, constants.BALL_RADIUS), constants.BALL_RADIUS)
         self.rect = self.image.get_rect()
@@ -18,8 +20,8 @@ class Ball(pygame.sprite.Sprite):
         # if self.initial_dx is None:
         if (dx is not None):
             self.dx = dx
-        self.rect.x = constants.SCREEN_WIDTH // 2 - constants.BALL_RADIUS
-        self.rect.y = constants.SCREEN_HEIGHT // 2 - constants.BALL_RADIUS
+        self.rect.x = self.screen_width // 2 - constants.BALL_RADIUS
+        self.rect.y = self.screen_height // 2 - constants.BALL_RADIUS
         self.dy = 1 # Initial vertical velocity (upwards)
         self.speed_multiplier = 1.0 # Can be increased for difficulty
         self.old_rect = self.rect.copy()
@@ -28,8 +30,8 @@ class Ball(pygame.sprite.Sprite):
         """Resets the ball to its starting position and velocity."""
         # if self.initial_dx is None:
         self.dx = random.randint(-2, 2)
-        self.rect.x = constants.SCREEN_WIDTH // 2 - constants.BALL_RADIUS
-        self.rect.y = constants.SCREEN_HEIGHT // 2 - constants.BALL_RADIUS
+        self.rect.x = self.screen_width // 2 - constants.BALL_RADIUS
+        self.rect.y = self.screen_height // 2 - constants.BALL_RADIUS
         self.dy = 1 # Initial vertical velocity (upwards)
         self.old_rect = self.rect.copy()
 
@@ -41,10 +43,10 @@ class Ball(pygame.sprite.Sprite):
         self.rect.y += self.dy * self.speed_multiplier
 
         # Wall collisions (left/right)
-        if self.rect.left < 0 or self.rect.right > constants.SCREEN_WIDTH:
+        if self.rect.left < 0 or self.rect.right > self.screen_width:
             self.dx *= -1 # Reverse horizontal direction
             self.rect.left = max(0, self.rect.left) # Keep within bounds
-            self.rect.right = min(constants.SCREEN_WIDTH, self.rect.right)
+            self.rect.right = min(self.screen_width, self.rect.right)
 
         # Wall collision (top)
         if self.rect.top < 0:

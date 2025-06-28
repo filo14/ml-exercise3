@@ -10,12 +10,14 @@ class Game:
         """Initialize the game and set screen."""
         self.screen = screen
 
+        self.screen_width, self.screen_height = screen.get_size()
+
         self.all_sprites = pygame.sprite.Group()
         self.bricks = pygame.sprite.Group()
         self.init_bricks = pygame.sprite.Group()
-        self.paddle = Paddle()
+        self.paddle = Paddle(self.screen_width, self.screen_height)
 
-        self.ball = Ball()
+        self.ball = Ball(self.screen_width, self.screen_height)
 
 
         self.all_sprites.add(self.paddle)
@@ -45,7 +47,7 @@ class Game:
             if isinstance(sprite, Brick):
                 sprite.kill()
 
-        start_x = (constants.SCREEN_WIDTH - num_cols * constants.BRICK_WIDTH) // 2
+        start_x = (self.screen_width - num_cols * constants.BRICK_WIDTH) // 2
         start_y = 50
 
         if layout_type == "rectangle":
@@ -62,7 +64,7 @@ class Game:
             max_cols = num_cols
             for row in range(num_rows):
                 current_cols = max_cols - row
-                row_start_x = (constants.SCREEN_WIDTH - current_cols * constants.BRICK_WIDTH) // 2
+                row_start_x = ( self.screen_width - current_cols * constants.BRICK_WIDTH) // 2
                 for col in range(current_cols):
                     x = row_start_x + col * constants.BRICK_WIDTH
                     y = start_y + row * constants.BRICK_HEIGHT
@@ -78,7 +80,7 @@ class Game:
                     current_cols = num_cols
 
                 row_width = current_cols * constants.BRICK_WIDTH
-                row_start_x = (constants.SCREEN_WIDTH - row_width) // 2
+                row_start_x = ( self.screen_width - row_width) // 2
 
                 for col in range(current_cols):
                     x = row_start_x + col * constants.BRICK_WIDTH
@@ -148,11 +150,11 @@ class Game:
             self.score_per_point -= 1
 
         # Check if ball went past the paddle
-        if self.ball.rect.top > constants.SCREEN_HEIGHT:
+        if self.ball.rect.top >  self.screen_height:
             self.create_bricks_layout(self.layout_type, num_rows=self.num_rows, num_cols=self.num_cols)
             self.score = 0
             self.ball.reset()
-            self.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH) // 2 # Reset paddle position
+            self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2 # Reset paddle position
             self.score_per_point = constants.SCORE_PER_POINT
 
         # Check if all bricks are cleared

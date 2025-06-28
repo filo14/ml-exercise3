@@ -78,8 +78,9 @@ class MonteCarloAgent:
         total_reward = 0
 
         # Reset paddle and ball
-        game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH) // 2
-        game.ball.spawn(starting_state)
+        screen_width, _ = screen.get_size()
+        game.paddle.rect.x = (screen_width - constants.PADDLE_WIDTH) // 2
+        game.ball.spawn(ball_start_direction)
 
         for t in range(max_steps):
             state = self.get_state(game)
@@ -106,14 +107,13 @@ class MonteCarloAgent:
 
         return episode, total_reward
 
-    def run(self, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100, ball_start_direction=0, max_steps=1000):
+    def run(self, screen, num_episodes=1000, layout="rectangle", rows=5, cols=10, print_every=100, ball_start_direction=0, max_steps=1000):
         """
         Run Monte Carlo control for a number of episodes.
         """
         # Initialize Pygame (headless mode)
         pygame.init()
         # Create a screen surface (not displayed)
-        screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 
         for ep in range(1, num_episodes + 1):
             episode, total_reward = self.generate_episode(screen, layout, rows, cols, ball_start_direction=ball_start_direction, max_steps=max_steps)
@@ -183,106 +183,40 @@ class MonteCarloAgent:
         best_actions = [a for a, v in qs.items() if v == max_val]
         return random.choice(best_actions)
 
-# Example usage:
-if __name__ == "__main__":
-    # 1) Train in‐memory
-    starting_states = [-2]
-    brick_layouts = [constants.INVERTED_PYRAMID_LAYOUT]
-    for brick_layout in brick_layouts:
-
-        for starting_state in starting_states:
-
-            agent = MonteCarloAgent(epsilon=0.1)
-            agent.run(
-                num_episodes=constants.NUM_OF_EPISODES,
-                layout=brick_layout,
-                rows=constants.ROWS_RECTANGLE,
-                cols=constants.BRICK_COLUMNS,
-                print_every=100,
-                ball_start_direction=starting_state
-            )
-
-            # # 2) Evaluate with actual rendering
-            pygame.init()
-            pygame.event.set_allowed(None)
-            screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
-            pygame.display.set_caption("MC Agent Evaluation")
-            clock = pygame.time.Clock()
-
-            game = Game(screen, ball_start_direction=starting_state)
-            game.create_bricks_layout(
-                brick_layout,
-                num_rows=constants.ROWS_RECTANGLE,
-                num_cols=constants.BRICK_COLUMNS
-            )
-            # reset ball & paddle positions
-            game.ball.spawn(starting_state)
-            game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH)//2
-
-            ball_trail = []
-            running = True
-            while running:
-                pygame.event.pump()  # allow window events (so it doesn’t “not responding”)
-                # 1) pick action by policy
-                # state = agent.get_state(game)
-                # action = agent.policy.get(state, agent.choose_action(state))
-                agent.epsilon = 0
-                state = agent.get_state(game)
-                action = agent.greedy_action(state)
-
-                if action == -1:
-                    game.paddle.move_left()
-                elif action == 1:
-                    game.paddle.move_right()
-                # 2) step & draw
-                game.update()
-                ball_trail.append(game.ball.rect.center)
-                game.draw()
-                # pygame.time.delay(30)
-
-                clock.tick(60)
-
-                if game.game_over:
-                    running = False
-
-            game.draw(ball_trail, True)
-
-            filename = f"imgs/trajectories/final_game_state_{brick_layout}_{starting_state}.png"
-
-            try:
-                # Get the entire display surface and save it
-                pygame.image.save(screen, filename)
-                print(f"Screenshot saved as {filename}")
-            except pygame.error as e:
-                print(f"Error saving screenshot: {e}")
+def run_monte_carlo(num_episodes, layout, rows, cols, ball_start_direction, print_every):
+    screen_width = cols * constants.BRICK_WIDTH + constants.GAME_UNIT * 3
+    screen_height = rows * constants.BRICK_HEIGHT * 4
+    screen = pygame.display.set_mode((screen_width, screen_height))
 
     agent = MonteCarloAgent(epsilon=0.1)
     agent.run(
-        num_episodes=constants.NUM_OF_EPISODES,
-        layout="pyramid",
-        rows=10,
-        cols=10,
-        print_every=100,
-        ball_start_direction=0,
-        max_steps=5000
+        screen=screen,
+        num_episodes=num_episodes,
+        layout=layout,
+        rows=rows,
+        cols=cols,
+        print_every=print_every,
+        ball_start_direction=ball_start_direction
     )
 
     # # 2) Evaluate with actual rendering
     pygame.init()
     pygame.event.set_allowed(None)
-    screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+
     pygame.display.set_caption("MC Agent Evaluation")
     clock = pygame.time.Clock()
 
-    game = Game(screen, ball_start_direction=0)
+    screen = pygame.display.set_mode((screen_width, screen_height))
+
+    game = Game(screen, ball_start_direction=ball_start_direction)
     game.create_bricks_layout(
-        brick_layout,
-        num_rows=10,
-        num_cols=10
+        layout,
+        num_rows=rows,
+        num_cols=cols
     )
     # reset ball & paddle positions
-    game.ball.spawn(0)
-    game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH) // 2
+    game.ball.spawn(ball_start_direction)
+    game.paddle.rect.x = (screen_width - constants.PADDLE_WIDTH) // 2
 
     ball_trail = []
     running = True
@@ -312,7 +246,7 @@ if __name__ == "__main__":
 
     game.draw(ball_trail, True)
 
-    filename = f"imgs/trajectories/final_game_state_{brick_layout}_{0}_test.png"
+    filename = f"imgs/trajectories/final_game_state_testshit.png"
 
     try:
         # Get the entire display surface and save it
@@ -320,6 +254,30 @@ if __name__ == "__main__":
         print(f"Screenshot saved as {filename}")
     except pygame.error as e:
         print(f"Error saving screenshot: {e}")
+
+# Example usage:
+if __name__ == "__main__":
+    # 1) Train in‐memory
+    starting_states = [-2]
+    brick_layouts = [constants.INVERTED_PYRAMID_LAYOUT]
+    for brick_layout in brick_layouts:
+
+        for starting_state in starting_states:
+            run_monte_carlo(
+                1000,
+                brick_layout,
+                3,
+                3,
+                starting_state,
+                100)
+
+    run_monte_carlo(
+        1000,
+        "pyramid",
+        6,
+        6,
+        0,
+        100)
 
     pygame.quit()
     print("Evaluation complete!")
