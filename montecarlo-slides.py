@@ -183,7 +183,7 @@ class MonteCarloAgent:
         best_actions = [a for a, v in qs.items() if v == max_val]
         return random.choice(best_actions)
 
-def run_monte_carlo(num_episodes, layout, rows, cols, ball_start_direction, print_every):
+def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_direction, print_every):
     screen_width = cols * constants.BRICK_WIDTH + constants.GAME_UNIT * 3
     screen_height = constants.GAME_UNIT * 8 + rows * constants.BRICK_HEIGHT * 2
     screen = pygame.display.set_mode((screen_width, screen_height))
@@ -196,7 +196,8 @@ def run_monte_carlo(num_episodes, layout, rows, cols, ball_start_direction, prin
         rows=rows,
         cols=cols,
         print_every=print_every,
-        ball_start_direction=ball_start_direction
+        ball_start_direction=ball_start_direction,
+        max_steps=max_steps
     )
 
     # # 2) Evaluate with actual rendering
@@ -259,12 +260,13 @@ def run_monte_carlo(num_episodes, layout, rows, cols, ball_start_direction, prin
 if __name__ == "__main__":
     # 1) Train in‐memory
     starting_states = [-2]
-    brick_layouts = [constants.INVERTED_PYRAMID_LAYOUT]
+    brick_layouts = [constants.RECTANGLE_LAYOUT]
     for brick_layout in brick_layouts:
 
         for starting_state in starting_states:
             run_monte_carlo(
                 1000,
+                3000,
                 brick_layout,
                 3,
                 3,
@@ -273,6 +275,7 @@ if __name__ == "__main__":
 
     run_monte_carlo(
         1000,
+        10000,
         "pyramid",
         6,
         6,
