@@ -31,6 +31,7 @@ def main_game_loop():
         num_rows=num_bricks_config['rows'],
         num_cols=num_bricks_config['cols']
     )
+    game.ball.spawn(0)
 
     # Manual Play Mode
     print("\n--- Starting Manual Play Mode ---")

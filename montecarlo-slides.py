@@ -78,8 +78,8 @@ class MonteCarloAgent:
         total_reward = 0
 
         # Reset paddle and ball
-        game.ball.reset()
         game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH) // 2
+        game.ball.spawn(starting_state)
 
         for t in range(max_steps):
             state = self.get_state(game)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
                 num_cols=constants.BRICK_COLUMNS
             )
             # reset ball & paddle positions
-            game.ball.reset()
+            game.ball.spawn(starting_state)
             game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH)//2
 
             ball_trail = []
@@ -255,6 +255,71 @@ if __name__ == "__main__":
                 print(f"Screenshot saved as {filename}")
             except pygame.error as e:
                 print(f"Error saving screenshot: {e}")
+
+    agent = MonteCarloAgent(epsilon=0.1)
+    agent.run(
+        num_episodes=constants.NUM_OF_EPISODES,
+        layout="pyramid",
+        rows=10,
+        cols=10,
+        print_every=100,
+        ball_start_direction=0,
+        max_steps=5000
+    )
+
+    # # 2) Evaluate with actual rendering
+    pygame.init()
+    pygame.event.set_allowed(None)
+    screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
+    pygame.display.set_caption("MC Agent Evaluation")
+    clock = pygame.time.Clock()
+
+    game = Game(screen, ball_start_direction=0)
+    game.create_bricks_layout(
+        brick_layout,
+        num_rows=10,
+        num_cols=10
+    )
+    # reset ball & paddle positions
+    game.ball.spawn(0)
+    game.paddle.rect.x = (constants.SCREEN_WIDTH - constants.PADDLE_WIDTH) // 2
+
+    ball_trail = []
+    running = True
+    while running:
+        pygame.event.pump()  # allow window events (so it doesn’t “not responding”)
+        # 1) pick action by policy
+        # state = agent.get_state(game)
+        # action = agent.policy.get(state, agent.choose_action(state))
+        agent.epsilon = 0
+        state = agent.get_state(game)
+        action = agent.greedy_action(state)
+
+        if action == -1:
+            game.paddle.move_left()
+        elif action == 1:
+            game.paddle.move_right()
+        # 2) step & draw
+        game.update()
+        ball_trail.append(game.ball.rect.center)
+        game.draw()
+        # pygame.time.delay(30)
+
+        clock.tick(60)
+
+        if game.game_over:
+            running = False
+
+    game.draw(ball_trail, True)
+
+    filename = f"imgs/trajectories/final_game_state_{brick_layout}_{0}_test.png"
+
+    try:
+        # Get the entire display surface and save it
+        pygame.image.save(screen, filename)
+        print(f"Screenshot saved as {filename}")
+    except pygame.error as e:
+        print(f"Error saving screenshot: {e}")
 
     pygame.quit()
     print("Evaluation complete!")

@@ -4,7 +4,7 @@ import constants
 
 class Ball(pygame.sprite.Sprite):
     """Represents the ball."""
-    def __init__(self, dx=None):
+    def __init__(self):
         """Initialize the ball."""
         super().__init__()
         self.image = pygame.Surface([constants.BALL_RADIUS * 2, constants.BALL_RADIUS * 2], pygame.SRCALPHA)
@@ -31,7 +31,6 @@ class Ball(pygame.sprite.Sprite):
         self.rect.x = constants.SCREEN_WIDTH // 2 - constants.BALL_RADIUS
         self.rect.y = constants.SCREEN_HEIGHT // 2 - constants.BALL_RADIUS
         self.dy = 1 # Initial vertical velocity (upwards)
-        self.speed_multiplier = 1.0 # Can be increased for difficulty
         self.old_rect = self.rect.copy()
 
     def update(self):

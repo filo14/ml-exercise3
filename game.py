@@ -14,10 +14,9 @@ class Game:
         self.bricks = pygame.sprite.Group()
         self.init_bricks = pygame.sprite.Group()
         self.paddle = Paddle()
-        if ball_start_direction != None:
-            self.ball = Ball(ball_start_direction)
-        else:
-            self.ball = Ball()
+
+        self.ball = Ball()
+
 
         self.all_sprites.add(self.paddle)
         self.all_sprites.add(self.ball)
