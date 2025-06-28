@@ -6,11 +6,14 @@ import constants
 
 class Game:
     """Manages the overall game state and logic."""
-    def __init__(self, screen, ball_start_direction=None):
+    def __init__(self, screen, max_score=1000, ball_start_direction=None):
         """Initialize the game and set screen."""
         self.screen = screen
 
         self.screen_width, self.screen_height = screen.get_size()
+
+        self.max_score = max_score
+        self.score = max_score
 
         self.all_sprites = pygame.sprite.Group()
         self.bricks = pygame.sprite.Group()
@@ -23,14 +26,11 @@ class Game:
         self.all_sprites.add(self.paddle)
         self.all_sprites.add(self.ball)
 
-        self.score = 0
         self.game_over = False
 
         self.layout_type = None
         self.num_rows = None
         self.num_cols = None
-
-        self.score_per_point = constants.SCORE_PER_POINT
 
     def create_bricks_layout(self, layout_type="rectangle", num_rows=5, num_cols=10):
         """
@@ -116,8 +116,6 @@ class Game:
         # Ball-brick collisions
         hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True) # True means remove brick
         for brick in hit_bricks:
-            self.score += self.score_per_point
-
             # Collision from top
             if self.ball.old_rect.bottom <= brick.rect.top < self.ball.rect.bottom:
                 self.ball.dy *= -1
@@ -146,16 +144,15 @@ class Game:
         self.paddle.update() # No action parameter here
         self.ball.update()
         self.handle_collisions()
-        if self.score_per_point > 1:
-            self.score_per_point -= 1
+        if self.score >= 1:
+            self.score -= 1
 
         # Check if ball went past the paddle
         if self.ball.rect.top >  self.screen_height:
             self.create_bricks_layout(self.layout_type, num_rows=self.num_rows, num_cols=self.num_cols)
-            self.score = 0
+            self.score = self.max_score
             self.ball.reset()
             self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2 # Reset paddle position
-            self.score_per_point = constants.SCORE_PER_POINT
 
         # Check if all bricks are cleared
         if not self.bricks:
@@ -175,7 +172,7 @@ class Game:
 
         self.all_sprites.draw(self.screen)
 
-        # Display score and lives
+        # Display score
         font = pygame.font.Font(None, 36)
         score_text = font.render(f"Score: {self.score}", True, constants.WHITE)
         self.screen.blit(score_text, (10, 10))

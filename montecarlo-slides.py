@@ -35,8 +35,9 @@ class MonteCarloAgent:
         ball_bin_x = game.ball.rect.x // constants.GAME_UNIT
         ball_bin_y = game.ball.rect.y // constants.GAME_UNIT
         # Discretize ball direction
-        ball_dx = int( game.ball.dx) # -1, 0, 1
-        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx
+        ball_dx = int(np.sign(game.ball.dx)) # -1, 0, 1
+        ball_dy = int(np.sign(game.ball.dy))
+        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx, ball_dy
 
     def initialize_state(self, state):
         """
@@ -71,7 +72,7 @@ class MonteCarloAgent:
         Generate an episode following current epsilon-soft policy.
         Returns a list of (state, action, reward)."""
         # Initialize game
-        game = Game(screen, ball_start_direction=ball_start_direction)
+        game = Game(screen, max_score=max_steps, ball_start_direction=ball_start_direction)
         game.create_bricks_layout(layout, num_rows=rows, num_cols=cols)
 
         episode = []
@@ -197,7 +198,7 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
 
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    game = Game(screen, ball_start_direction=ball_start_direction)
+    game = Game(screen, max_score=max_steps, ball_start_direction=ball_start_direction)
     game.create_bricks_layout(
         layout,
         num_rows=rows,
