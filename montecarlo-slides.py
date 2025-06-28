@@ -145,18 +145,6 @@ class MonteCarloAgent:
             if ep % print_every == 0:
                 print(f"Episode {ep}/{num_episodes}, last reward: {total_reward}")
 
-        # Plot learning curve
-        plt.plot(self.rewards_history)
-        min_return = min(self.rewards_history)
-        plt.ylim(min_return, 0)  # bottom = worst episode, top = 0
-        plt.xlabel('Episode')
-        plt.ylabel('Total Reward')
-        plt.title(f'MC Control learning ({layout})')
-        plt.savefig(f"imgs/{brick_layout}-trajectory_{ball_start_direction}_{rows}x{cols}_learning.png")
-        plt.show()
-
-
-
         rewards = np.array(self.rewards_history)
         window = 100
         running = np.convolve(rewards, np.ones(window) / window, mode='valid')
@@ -166,7 +154,7 @@ class MonteCarloAgent:
         plt.xlabel('Episode')
         plt.ylabel('Total Reward')
         plt.title(f'MC Control learning ({layout})')
-        plt.savefig(f'imgs/average-curves/mc_learning_{layout}-trajectory_{ball_start_direction}.png')
+        plt.savefig(f"imgs/{brick_layout}-trajectory_{rows}x{cols}_{ball_start_direction}_learning.png")
         plt.show()
 
         pygame.quit()
@@ -247,7 +235,7 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
 
     game.draw(ball_trail, True)
 
-    filename = f"imgs/{brick_layout}-trajectory_{ball_start_direction}_{rows}x{cols}_final_state.png"
+    filename = f"imgs/{brick_layout}-trajectory_{rows}x{cols}_{ball_start_direction}_final_state.png"
 
     try:
         # Get the entire display surface and save it
