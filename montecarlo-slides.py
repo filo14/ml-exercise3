@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import pygame
+import time
 
 import constants
 from game import Game
@@ -177,7 +178,11 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
     screen_height = constants.GAME_UNIT * 8 + rows * constants.BRICK_HEIGHT * 2
     screen = pygame.display.set_mode((screen_width, screen_height))
 
+
     agent = MonteCarloAgent(epsilon=0.1)
+
+    start_time = time.time()
+
     agent.run(
         screen=screen,
         num_episodes=num_episodes,
@@ -188,6 +193,8 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
         ball_start_direction=ball_start_direction,
         max_steps=max_steps
     )
+
+    elapsed_time = time.time() - start_time
 
     # # 2) Evaluate with actual rendering
     pygame.init()
@@ -245,14 +252,19 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
     except pygame.error as e:
         print(f"Error saving screenshot: {e}")
 
+    return elapsed_time
+
 # Example usage:
 if __name__ == "__main__":
     # 1) Train in‐memory
-    starting_states = [-2, -1, 0, 1, 2]
+
+    starting_states = [-2]
     brick_layouts = [constants.RECTANGLE_LAYOUT, constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT]
+    runtimes = {layout: [] for layout in brick_layouts}
     for starting_state in starting_states:
         for brick_layout in brick_layouts:
-            run_monte_carlo(
+
+            elapsed_time = run_monte_carlo(
                 1000,
                 3000,
                 brick_layout,
@@ -260,6 +272,22 @@ if __name__ == "__main__":
                 3,
                 starting_state,
                 100)
+
+            runtimes[brick_layout].append(elapsed_time)
+            print(f"Training runtime: {elapsed_time:.2f} seconds")
+
+    plt.figure(figsize=(8, 6))
+    for layout in brick_layouts:
+        plt.plot(starting_states, runtimes[layout], marker='o', label=layout)
+
+    plt.xlabel("Starting State")
+    plt.ylabel("Runtime (seconds)")
+    plt.title("Training Runtime per Layout and Starting State")
+    plt.legend(title="Layout")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("imgs/runtime_per_layout.png")
+    plt.show()
 
     run_monte_carlo(
         1000,
