@@ -161,8 +161,6 @@ class Game:
         if not self.bricks:
             self.game_over = True
 
-            print("You Win!")
-
     def draw(self, draw_trail=None, draw_hit_bricks=False):
         """Draws all game elements on the screen."""
         self.screen.fill(constants.BLACK) # Clear screen

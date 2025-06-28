@@ -142,8 +142,8 @@ class MonteCarloAgent:
                 best = random.choice(best_actions)
                 self.policy[state] = best
 
-            # if ep % print_every == 0:
-            print(f"Episode {ep}/{num_episodes}, last reward: {total_reward}")
+            if ep % print_every == 0:
+                print(f"Episode {ep}/{num_episodes}, last reward: {total_reward}")
 
         # Plot learning curve
         plt.plot(self.rewards_history)
@@ -152,7 +152,7 @@ class MonteCarloAgent:
         plt.xlabel('Episode')
         plt.ylabel('Total Reward')
         plt.title(f'MC Control learning ({layout})')
-        plt.savefig(f'imgs/learning-curves/mc_learning_{layout}-trajectory_{ball_start_direction}.png')
+        plt.savefig(f"imgs/{brick_layout}-trajectory_{ball_start_direction}_{rows}x{cols}_learning.png")
         plt.show()
 
 
@@ -247,7 +247,7 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
 
     game.draw(ball_trail, True)
 
-    filename = f"imgs/trajectories/final_game_state_testshit.png"
+    filename = f"imgs/{brick_layout}-trajectory_{ball_start_direction}_{rows}x{cols}_final_state.png"
 
     try:
         # Get the entire display surface and save it
@@ -259,11 +259,10 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
 # Example usage:
 if __name__ == "__main__":
     # 1) Train in‐memory
-    starting_states = [-2]
-    brick_layouts = [constants.RECTANGLE_LAYOUT]
-    for brick_layout in brick_layouts:
-
-        for starting_state in starting_states:
+    starting_states = [-2, -1, 0, 1, 2]
+    brick_layouts = [constants.RECTANGLE_LAYOUT, constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT]
+    for starting_state in starting_states:
+        for brick_layout in brick_layouts:
             run_monte_carlo(
                 1000,
                 3000,
@@ -277,8 +276,8 @@ if __name__ == "__main__":
         1000,
         10000,
         "pyramid",
-        6,
-        6,
+        5,
+        5,
         0,
         100)
 
