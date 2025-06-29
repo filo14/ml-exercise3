@@ -333,8 +333,8 @@ if __name__ == "__main__":
     for starting_state in starting_states:
         for brick_layout in brick_layouts:
             elapsed_time = run_monte_carlo(
-                1000,
-                30000,
+                2000,
+                50000,
                 brick_layout,
                 5,
                 5,
