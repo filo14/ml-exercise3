@@ -32,9 +32,9 @@ class MonteCarloAgent:
         Discretize the game state for tabular learning.
         """
         # Bin positions by game unit
-        paddle_bin = game.paddle.rect.x // constants.GAME_UNIT
-        ball_bin_x = game.ball.rect.x // constants.GAME_UNIT
-        ball_bin_y = game.ball.rect.y // constants.GAME_UNIT
+        paddle_bin = game.paddle.rect.x // (2*constants.GAME_UNIT)
+        ball_bin_x = game.ball.rect.x // (2*constants.GAME_UNIT)
+        ball_bin_y = game.ball.rect.y // (2*constants.GAME_UNIT)
         # Discretize ball direction
         ball_dx = int(np.sign(game.ball.dx)) # -1, 0, 1
         ball_dy = int(np.sign(game.ball.dy))
@@ -265,8 +265,8 @@ if __name__ == "__main__":
         for brick_layout in brick_layouts:
 
             elapsed_time = run_monte_carlo(
-                1000,
-                3000,
+                1500,
+                15000,
                 brick_layout,
                 3,
                 3,
@@ -277,19 +277,6 @@ if __name__ == "__main__":
             print(f"Training runtime: {elapsed_time:.2f} seconds")
 
 
-
-    # plt.figure(figsize=(8, 6))
-    # for layout in brick_layouts:
-    #     plt.plot(starting_states, runtimes[layout], marker='o', label=layout)
-    #
-    # plt.xlabel("Starting State")
-    # plt.ylabel("Runtime (seconds)")
-    # plt.title("Training Runtime per Layout and Starting State")
-    # plt.legend(title="Layout")
-    # plt.grid(True)
-    # plt.tight_layout()
-    # plt.savefig("imgs/runtime_per_layout.png")
-    # plt.show()
 
     # plot runtime for each layout for each state
     n_states = len(starting_states)
@@ -337,6 +324,7 @@ if __name__ == "__main__":
     plt.legend(title="Layout")
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.tight_layout()
+    plt.savefig('imgs/grouped_runtimes.png')
     plt.show()
 
     starting_states = [-2, -1, 0]
@@ -346,7 +334,7 @@ if __name__ == "__main__":
         for brick_layout in brick_layouts:
             elapsed_time = run_monte_carlo(
                 1000,
-                10000,
+                30000,
                 brick_layout,
                 5,
                 5,
@@ -356,18 +344,6 @@ if __name__ == "__main__":
             runtimes[brick_layout].append(elapsed_time)
             print(f"Training runtime: {elapsed_time:.2f} seconds")
 
-    # plt.figure(figsize=(8, 6))
-    # for layout in brick_layouts:
-    #     plt.plot(starting_states, runtimes[layout], marker='o', label=layout)
-    #
-    # plt.xlabel("Starting State")
-    # plt.ylabel("Runtime (seconds)")
-    # plt.title("Training Runtime per Layout and Starting State")
-    # plt.legend(title="Layout")
-    # plt.grid(True)
-    # plt.tight_layout()
-    # plt.savefig("imgs/runtime_per_layout.png")
-    # plt.show()
 
     # plot runtime for each layout for each state
     n_states = len(starting_states)
@@ -415,6 +391,7 @@ if __name__ == "__main__":
     plt.legend(title="Layout")
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.tight_layout()
+    plt.savefig('imgs/grouped-large_runtimes.png')
     plt.show()
 
     pygame.quit()
