@@ -276,17 +276,65 @@ if __name__ == "__main__":
             runtimes[brick_layout].append(elapsed_time)
             print(f"Training runtime: {elapsed_time:.2f} seconds")
 
-    plt.figure(figsize=(8, 6))
-    for layout in brick_layouts:
-        plt.plot(starting_states, runtimes[layout], marker='o', label=layout)
+    # plt.figure(figsize=(8, 6))
+    # for layout in brick_layouts:
+    #     plt.plot(starting_states, runtimes[layout], marker='o', label=layout)
+    #
+    # plt.xlabel("Starting State")
+    # plt.ylabel("Runtime (seconds)")
+    # plt.title("Training Runtime per Layout and Starting State")
+    # plt.legend(title="Layout")
+    # plt.grid(True)
+    # plt.tight_layout()
+    # plt.savefig("imgs/runtime_per_layout.png")
+    # plt.show()
 
-    plt.xlabel("Starting State")
-    plt.ylabel("Runtime (seconds)")
-    plt.title("Training Runtime per Layout and Starting State")
+    # plot runtime for each layout for each state
+    n_states = len(starting_states)
+    n_layouts = len(brick_layouts)
+    x = np.arange(n_states)
+    total_width = 0.8
+    bar_width = total_width / n_layouts
+
+    plt.figure(figsize=(10, 6))
+    cmap = plt.get_cmap('tab10')
+
+    for i, layout in enumerate(brick_layouts):
+        y = runtimes[layout]
+        bars = plt.bar(
+            x + i * bar_width,
+            y,
+            width=bar_width,
+            label=layout,
+            color=[cmap(i)] * n_states,
+            edgecolor='black',
+            linewidth=1
+        )
+        # Add data labels
+        for bar in bars:
+            h = bar.get_height()
+            plt.text(
+                bar.get_x() + bar.get_width() / 2,
+                h + 0.3,
+                f'{h:.2f}',
+                ha='center',
+                va='bottom',
+                fontsize=9
+            )
+
+    # Clean up spines
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # Formatting
+    plt.xticks(x + total_width / 2 - bar_width / 2, starting_states, fontsize=10)
+    plt.xlabel("Starting State", fontsize=12)
+    plt.ylabel("Runtime (seconds)", fontsize=12)
+    plt.title("Training Runtime per Layout & Starting State", fontsize=14, fontweight='bold')
     plt.legend(title="Layout")
-    plt.grid(True)
+    plt.grid(axis='y', linestyle='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig("imgs/runtime_per_layout.png")
     plt.show()
 
     run_monte_carlo(
