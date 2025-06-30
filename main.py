@@ -37,12 +37,13 @@ def main_game_loop():
     print("\n--- Starting Manual Play Mode ---")
 
     while running:
-        pygame.event.get()
+        for e in pygame.event.get():
+            if e.type == pygame.KEYDOWN:  # Check if a key was pressed down
+                if e.key == pygame.K_LEFT:
+                    game.paddle.move_left()
+                elif e.key == pygame.K_RIGHT:
+                    game.paddle.move_right()
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            game.paddle.move_left()
-        if keys[pygame.K_RIGHT]:
-            game.paddle.move_right()
         if keys[pygame.K_ESCAPE]:
             running = False
 
@@ -50,7 +51,7 @@ def main_game_loop():
             running = False
         game.update()
         game.draw()
-        clock.tick(60) # Limit frame rate to 60 FPS
+        clock.tick(30) # Limit frame rate to 30 FPS
 
     pygame.quit()
     print("Pygame exited.")

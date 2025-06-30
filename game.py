@@ -153,6 +153,7 @@ class Game:
             self.score = self.max_score
             self.ball.reset()
             self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2 # Reset paddle position
+            self.paddle.vx = 0
 
         # Check if all bricks are cleared
         if not self.bricks:

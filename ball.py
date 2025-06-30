@@ -18,7 +18,7 @@ class Ball(pygame.sprite.Sprite):
     def spawn(self, dx=None):
         """Resets the ball to its starting position and velocity."""
         # if self.initial_dx is None:
-        if (dx is not None):
+        if dx is not None:
             self.dx = dx
         self.rect.x = self.screen_width // 2 - constants.BALL_RADIUS
         self.rect.y = self.screen_height // 2 + self.screen_height // 4 - constants.BALL_RADIUS

@@ -38,7 +38,10 @@ class MonteCarloAgent:
         # Discretize ball direction
         ball_dx = int(np.sign(game.ball.dx)) # -1, 0, 1
         ball_dy = int(np.sign(game.ball.dy))
-        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx, ball_dy
+
+        paddle_velocity = int(game.paddle.vx)
+
+        return paddle_bin, ball_bin_x, ball_bin_y, ball_dx, ball_dy, paddle_velocity
 
     def initialize_state(self, state):
         """
@@ -72,6 +75,8 @@ class MonteCarloAgent:
         """
         Generate an episode following current epsilon-soft policy.
         Returns a list of (state, action, reward)."""
+        # self.epsilon = max(0.995 * self.epsilon, 0.01)
+
         # Initialize game
         game = Game(screen, max_score=max_steps, ball_start_direction=ball_start_direction)
         game.create_bricks_layout(layout, num_rows=rows, num_cols=cols)
@@ -89,10 +94,7 @@ class MonteCarloAgent:
             action = self.choose_action(state)
 
             # Apply action to paddle
-            if action == -1:
-                game.paddle.move_left()
-            elif action == 1:
-                game.paddle.move_right()
+            game.paddle.vx = max(-game.paddle.max_speed, min(game.paddle.max_speed, game.paddle.vx + action))
 
             # Environment step
             game.update()
@@ -120,7 +122,6 @@ class MonteCarloAgent:
         for ep in range(1, num_episodes + 1):
             episode, total_reward = self.generate_episode(screen, layout, rows, cols, ball_start_direction=ball_start_direction, max_steps=max_steps)
             self.rewards_history.append(total_reward)
-            self.epsilon = max(self.epsilon * 0.995, 0.01)
 
             # Keep track of first visits
             visited = set()
@@ -265,8 +266,8 @@ if __name__ == "__main__":
         for brick_layout in brick_layouts:
 
             elapsed_time = run_monte_carlo(
-                1500,
-                15000,
+                2000,
+                5000,
                 brick_layout,
                 3,
                 3,
@@ -327,14 +328,14 @@ if __name__ == "__main__":
     plt.savefig('imgs/grouped_runtimes.png')
     plt.show()
 
-    starting_states = [-2, -1, 0]
-    brick_layouts = [constants.RECTANGLE_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT]
+    starting_states = [0]
+    brick_layouts = [constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT, constants.RECTANGLE_LAYOUT]
     runtimes = {layout: [] for layout in brick_layouts}
     for starting_state in starting_states:
         for brick_layout in brick_layouts:
             elapsed_time = run_monte_carlo(
-                2000,
-                50000,
+                10000,
+                20000,
                 brick_layout,
                 5,
                 5,
