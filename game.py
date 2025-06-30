@@ -9,7 +9,7 @@ from paddle import Paddle
 class Game:
     """Manages the overall game state and logic."""
 
-    def __init__(self, screen, max_score=1000, ball_start_direction=None):
+    def __init__(self, screen, max_score=1000):
         """Initialize the game and set screen."""
         self.screen = screen
 
@@ -93,16 +93,12 @@ class Game:
                     self.init_bricks.add(Brick(x, y, color))
                     self.all_sprites.add(brick)
 
-        # print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
-
     def handle_collisions(self):
         """Handles ball collisions with paddle and bricks."""
         # Ball-paddle collision
         if pygame.sprite.collide_rect(self.ball, self.paddle):
-            # Ensure ball doesn't get stuck in paddle
             if self.ball.dy > 0:  # Only reflect if ball is moving down
                 self.ball.dy *= -1
-                # Adjust ball's y-position to prevent sticking
                 self.ball.rect.bottom = self.paddle.rect.top
 
                 # Calculate new horizontal velocity based on where it hit the paddle
@@ -115,34 +111,34 @@ class Game:
                 self.ball.dx = hit_position * 2  # Max horizontal speed 2
 
         # Ball-brick collisions
-        hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True)  # True means remove brick
+        hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True)
         for brick in hit_bricks:
             # Collision from top
             if self.ball.old_rect.bottom <= brick.rect.top < self.ball.rect.bottom:
                 self.ball.dy *= -1
-                self.ball.rect.bottom = brick.rect.top  # Adjust ball to prevent sticking
+                self.ball.rect.bottom = brick.rect.top
 
             # Collision from bottom
             elif self.ball.old_rect.top >= brick.rect.bottom > self.ball.rect.top:
                 self.ball.dy *= -1
-                self.ball.rect.top = brick.rect.bottom  # Adjust ball to prevent sticking
+                self.ball.rect.top = brick.rect.bottom
 
             # Collision from left
             elif self.ball.old_rect.right <= brick.rect.left < self.ball.rect.right:
                 self.ball.dx *= -1
-                self.ball.rect.right = brick.rect.left  # Adjust ball to prevent sticking
+                self.ball.rect.right = brick.rect.left
 
             # Collision from right
             elif self.ball.old_rect.left >= brick.rect.right > self.ball.rect.left:
                 self.ball.dx *= -1
-                self.ball.rect.left = brick.rect.right  # Adjust
+                self.ball.rect.left = brick.rect.right
 
-    def update(self):  # Removed 'action' parameter
+    def update(self):
         """Updates all game elements and handles game logic."""
         if self.game_over:
             return
 
-        self.paddle.update()  # No action parameter here
+        self.paddle.update()
         self.ball.update()
         self.handle_collisions()
         if self.score >= 1:
@@ -152,7 +148,7 @@ class Game:
         if self.ball.rect.top > self.screen_height:
             self.create_bricks_layout(self.layout_type, num_rows=self.num_rows, num_cols=self.num_cols)
             self.score = self.max_score
-            self.ball.reset()
+            self.ball.reset()  # Reset ball randomly
             self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2  # Reset paddle position
             self.paddle.vx = 0
 

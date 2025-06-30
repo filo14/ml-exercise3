@@ -24,8 +24,10 @@ class Paddle(pygame.sprite.Sprite):
         self.rect.x += self.vx
         if self.rect.x < 0:
             self.rect.x = 0
+            self.vx = 0
         if self.rect.x > self.screen_width - constants.PADDLE_WIDTH:
             self.rect.x = self.screen_width - constants.PADDLE_WIDTH
+            self.vx = 0
 
     def move_left(self):
         """Moves the paddle to the left."""

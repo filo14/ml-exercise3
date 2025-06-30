@@ -4,21 +4,21 @@ import constants
 from constants import ROWS_RECTANGLE, ROWS_PYRAMID, ROWS_INVERTED_PYRAMID
 from game import Game
 
-# --- Pygame Initialization ---
+# Pygame Initialization
 pygame.init()
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
-pygame.display.set_caption("Breakout Game")  # Changed title for basic game
+pygame.display.set_caption("Breakout Game")
 clock = pygame.time.Clock()
 
 
-# --- Main Game Loop ---
+# Main Game Loop
 
 def main_game_loop():
     """Run the main game loop."""
     game = Game(screen)
     running = True
 
-    # Define the initial layout for the simplified game
+    # Define initial layout
     num_bricks_config = {}
     if constants.BRICK_LAYOUT == "rectangle":
         num_bricks_config = {"rows": ROWS_RECTANGLE, "cols": constants.BRICK_COLUMNS}
@@ -34,7 +34,6 @@ def main_game_loop():
         num_rows=num_bricks_config['rows'],
         num_cols=num_bricks_config['cols']
     )
-    game.ball.spawn(0)
 
     # Manual Play Mode
     print("\n--- Starting Manual Play Mode ---")
@@ -44,7 +43,7 @@ def main_game_loop():
             if e.type == pygame.KEYDOWN:  # Check if a key was pressed down
                 if e.key == pygame.K_LEFT:
                     game.paddle.move_left()
-                elif e.key == pygame.K_RIGHT:
+                if e.key == pygame.K_RIGHT:
                     game.paddle.move_right()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
