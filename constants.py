@@ -1,5 +1,5 @@
 # --- Game Constants ---
-BRICK_LAYOUT = "inverted_pyramid" # select from "rectangle" / "pyramid" / "scattered"
+BRICK_LAYOUT = "inverted_pyramid"  # select from "rectangle" / "pyramid" / "scattered"
 INVERTED_PYRAMID_LAYOUT = "inverted_pyramid"
 RECTANGLE_LAYOUT = "rectangle"
 PYRAMID_LAYOUT = "pyramid"
@@ -20,7 +20,7 @@ SCREEN_HEIGHT = GAME_UNIT * 15
 
 SCORE_PER_POINT = 1000
 
-BRICK_COLORS = [(255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255)] # Red, Orange, Yellow, Green, Blue
+BRICK_COLORS = [(255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255)]  # Red, Orange, Yellow, Green, Blue
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (100, 100, 100)

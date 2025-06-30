@@ -1,11 +1,14 @@
 import pygame
-from brick import Brick
-from ball import Ball
-from paddle import Paddle
+
 import constants
+from ball import Ball
+from brick import Brick
+from paddle import Paddle
+
 
 class Game:
     """Manages the overall game state and logic."""
+
     def __init__(self, screen, max_score=1000, ball_start_direction=None):
         """Initialize the game and set screen."""
         self.screen = screen
@@ -21,7 +24,6 @@ class Game:
         self.paddle = Paddle(self.screen_width, self.screen_height)
 
         self.ball = Ball(self.screen_width, self.screen_height)
-
 
         self.all_sprites.add(self.paddle)
         self.all_sprites.add(self.ball)
@@ -41,7 +43,7 @@ class Game:
         self.num_rows = num_rows
         self.num_cols = num_cols
 
-        self.bricks.empty() # Clear existing bricks
+        self.bricks.empty()  # Clear existing bricks
         # Remove bricks from all_sprites before adding new ones
         for sprite in self.all_sprites:
             if isinstance(sprite, Brick):
@@ -64,7 +66,7 @@ class Game:
             max_cols = num_cols
             for row in range(num_rows):
                 current_cols = max_cols - row
-                row_start_x = ( self.screen_width - current_cols * constants.BRICK_WIDTH) // 2
+                row_start_x = (self.screen_width - current_cols * constants.BRICK_WIDTH) // 2
                 for col in range(current_cols):
                     x = row_start_x + col * constants.BRICK_WIDTH
                     y = start_y + row * constants.BRICK_HEIGHT
@@ -80,7 +82,7 @@ class Game:
                     current_cols = num_cols
 
                 row_width = current_cols * constants.BRICK_WIDTH
-                row_start_x = ( self.screen_width - row_width) // 2
+                row_start_x = (self.screen_width - row_width) // 2
 
                 for col in range(current_cols):
                     x = row_start_x + col * constants.BRICK_WIDTH
@@ -93,13 +95,12 @@ class Game:
 
         # print(f"Bricks created for layout: {layout_type} with {len(self.bricks)} bricks.")
 
-
     def handle_collisions(self):
         """Handles ball collisions with paddle and bricks."""
         # Ball-paddle collision
         if pygame.sprite.collide_rect(self.ball, self.paddle):
             # Ensure ball doesn't get stuck in paddle
-            if self.ball.dy > 0: # Only reflect if ball is moving down
+            if self.ball.dy > 0:  # Only reflect if ball is moving down
                 self.ball.dy *= -1
                 # Adjust ball's y-position to prevent sticking
                 self.ball.rect.bottom = self.paddle.rect.top
@@ -111,10 +112,10 @@ class Game:
                 # Normalize hit position to [-2, 2] relative to paddle width
                 hit_position = (ball_center_x - paddle_center_x) / (constants.PADDLE_WIDTH / 4)
                 # Adjust ball's dx based on hit_position
-                self.ball.dx = hit_position * 2 # Max horizontal speed 2
+                self.ball.dx = hit_position * 2  # Max horizontal speed 2
 
         # Ball-brick collisions
-        hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True) # True means remove brick
+        hit_bricks = pygame.sprite.spritecollide(self.ball, self.bricks, True)  # True means remove brick
         for brick in hit_bricks:
             # Collision from top
             if self.ball.old_rect.bottom <= brick.rect.top < self.ball.rect.bottom:
@@ -136,23 +137,23 @@ class Game:
                 self.ball.dx *= -1
                 self.ball.rect.left = brick.rect.right  # Adjust
 
-    def update(self): # Removed 'action' parameter
+    def update(self):  # Removed 'action' parameter
         """Updates all game elements and handles game logic."""
         if self.game_over:
             return
 
-        self.paddle.update() # No action parameter here
+        self.paddle.update()  # No action parameter here
         self.ball.update()
         self.handle_collisions()
         if self.score >= 1:
             self.score -= 1
 
         # Check if ball went past the paddle
-        if self.ball.rect.top >  self.screen_height:
+        if self.ball.rect.top > self.screen_height:
             self.create_bricks_layout(self.layout_type, num_rows=self.num_rows, num_cols=self.num_cols)
             self.score = self.max_score
             self.ball.reset()
-            self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2 # Reset paddle position
+            self.paddle.rect.x = (self.screen_width - constants.PADDLE_WIDTH) // 2  # Reset paddle position
             self.paddle.vx = 0
 
         # Check if all bricks are cleared
@@ -161,7 +162,7 @@ class Game:
 
     def draw(self, draw_trail=None, draw_hit_bricks=False):
         """Draws all game elements on the screen."""
-        self.screen.fill(constants.BLACK) # Clear screen
+        self.screen.fill(constants.BLACK)  # Clear screen
 
         if draw_hit_bricks:
             self.init_bricks.draw(self.screen)
@@ -169,7 +170,7 @@ class Game:
         if draw_trail is not None:
             for point in draw_trail:
                 ball_x, ball_y = point
-                pygame.draw.circle(self.screen, constants.RED, (int(ball_x), int(ball_y)), 1,0)
+                pygame.draw.circle(self.screen, constants.RED, (int(ball_x), int(ball_y)), 1, 0)
 
         self.all_sprites.draw(self.screen)
 
@@ -178,4 +179,4 @@ class Game:
         score_text = font.render(f"Score: {self.score}", True, constants.WHITE)
         self.screen.blit(score_text, (10, 10))
 
-        pygame.display.flip() # Update the display
+        pygame.display.flip()  # Update the display

@@ -36,10 +36,15 @@ class MonteCarloAgent:
         ball_bin_x = game.ball.rect.x // (2*constants.GAME_UNIT)
         ball_bin_y = game.ball.rect.y // (2*constants.GAME_UNIT)
         # Discretize ball direction
-        ball_dx = int(np.sign(game.ball.dx)) # -1, 0, 1
+        ball_dx = int(game.ball.dx) # -1, 0, 1
         ball_dy = int(np.sign(game.ball.dy))
 
         paddle_velocity = int(game.paddle.vx)
+
+        # min_y = min(b.rect.y for b in game.bricks)
+        # lowest_bricks = [b for b in game.bricks if b.rect.y == min_y]
+        # lowest_brick_x = (lowest_bricks[0].rect.x + lowest_bricks[-1].rect.right) // 2
+        # lowest_brick_x_bin = lowest_brick_x // (2 * constants.GAME_UNIT)
 
         return paddle_bin, ball_bin_x, ball_bin_y, ball_dx, ball_dy, paddle_velocity
 
@@ -174,13 +179,13 @@ class MonteCarloAgent:
         best_actions = [a for a, v in qs.items() if v == max_val]
         return random.choice(best_actions)
 
-def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_direction, print_every):
+def run_monte_carlo(epsilon, num_episodes, max_steps, layout, rows, cols, ball_start_direction, print_every):
     screen_width = cols * constants.BRICK_WIDTH + constants.GAME_UNIT * 3
     screen_height = constants.GAME_UNIT * 8 + rows * constants.BRICK_HEIGHT * 2
     screen = pygame.display.set_mode((screen_width, screen_height))
 
 
-    agent = MonteCarloAgent(epsilon=0.1)
+    agent = MonteCarloAgent(epsilon=epsilon)
 
     start_time = time.time()
 
@@ -235,7 +240,6 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
         game.update()
         ball_trail.append(game.ball.rect.center)
         game.draw()
-        # pygame.time.delay(30)
 
         clock.tick(60)
 
@@ -259,74 +263,75 @@ def run_monte_carlo(num_episodes, max_steps, layout, rows, cols, ball_start_dire
 if __name__ == "__main__":
     # 1) Train in‐memory
 
-    starting_states = [-2, -1, 0, 1, 2]
-    brick_layouts = [constants.RECTANGLE_LAYOUT, constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT]
-    runtimes = {layout: [] for layout in brick_layouts}
-    for starting_state in starting_states:
-        for brick_layout in brick_layouts:
-
-            elapsed_time = run_monte_carlo(
-                2000,
-                5000,
-                brick_layout,
-                3,
-                3,
-                starting_state,
-                100)
-
-            runtimes[brick_layout].append(elapsed_time)
-            print(f"Training runtime: {elapsed_time:.2f} seconds")
-
-
-
-    # plot runtime for each layout for each state
-    n_states = len(starting_states)
-    n_layouts = len(brick_layouts)
-    x = np.arange(n_states)
-    total_width = 0.8
-    bar_width = total_width / n_layouts
-
-    plt.figure(figsize=(10, 6))
-    cmap = plt.get_cmap('tab10')
-
-    for i, layout in enumerate(brick_layouts):
-        y = runtimes[layout]
-        bars = plt.bar(
-            x + i * bar_width,
-            y,
-            width=bar_width,
-            label=layout,
-            color=[cmap(i)] * n_states,
-            edgecolor='black',
-            linewidth=1
-        )
-        # Add data labels
-        for bar in bars:
-            h = bar.get_height()
-            plt.text(
-                bar.get_x() + bar.get_width() / 2,
-                h + 0.3,
-                f'{h:.2f}',
-                ha='center',
-                va='bottom',
-                fontsize=9
-            )
-
-    # Clean up spines
-    ax = plt.gca()
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-
-    # Formatting
-    plt.xticks(x + total_width / 2 - bar_width / 2, starting_states, fontsize=10)
-    plt.xlabel("Starting State", fontsize=12)
-    plt.ylabel("Runtime (seconds)", fontsize=12)
-    plt.title("Training Runtime per Layout & Starting State", fontsize=14, fontweight='bold')
-    plt.legend(title="Layout")
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-    plt.tight_layout()
-    plt.savefig('imgs/grouped_runtimes.png')
-    plt.show()
+    # starting_states = [-2, -1, 0, 1, 2]
+    # brick_layouts = [constants.RECTANGLE_LAYOUT, constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT]
+    # runtimes = {layout: [] for layout in brick_layouts}
+    # for starting_state in starting_states:
+    #     for brick_layout in brick_layouts:
+    #
+    #         elapsed_time = run_monte_carlo(
+    #             0.1,
+    #             2000,
+    #             5000,
+    #             brick_layout,
+    #             3,
+    #             3,
+    #             starting_state,
+    #             100)
+    #
+    #         runtimes[brick_layout].append(elapsed_time)
+    #         print(f"Training runtime: {elapsed_time:.2f} seconds")
+    #
+    #
+    #
+    # # plot runtime for each layout for each state
+    # n_states = len(starting_states)
+    # n_layouts = len(brick_layouts)
+    # x = np.arange(n_states)
+    # total_width = 0.8
+    # bar_width = total_width / n_layouts
+    #
+    # plt.figure(figsize=(10, 6))
+    # cmap = plt.get_cmap('tab10')
+    #
+    # for i, layout in enumerate(brick_layouts):
+    #     y = runtimes[layout]
+    #     bars = plt.bar(
+    #         x + i * bar_width,
+    #         y,
+    #         width=bar_width,
+    #         label=layout,
+    #         color=[cmap(i)] * n_states,
+    #         edgecolor='black',
+    #         linewidth=1
+    #     )
+    #     # Add data labels
+    #     for bar in bars:
+    #         h = bar.get_height()
+    #         plt.text(
+    #             bar.get_x() + bar.get_width() / 2,
+    #             h + 0.3,
+    #             f'{h:.2f}',
+    #             ha='center',
+    #             va='bottom',
+    #             fontsize=9
+    #         )
+    #
+    # # Clean up spines
+    # ax = plt.gca()
+    # ax.spines['top'].set_visible(False)
+    # ax.spines['right'].set_visible(False)
+    #
+    # # Formatting
+    # plt.xticks(x + total_width / 2 - bar_width / 2, starting_states, fontsize=10)
+    # plt.xlabel("Starting State", fontsize=12)
+    # plt.ylabel("Runtime (seconds)", fontsize=12)
+    # plt.title("Training Runtime per Layout & Starting State", fontsize=14, fontweight='bold')
+    # plt.legend(title="Layout")
+    # plt.grid(axis='y', linestyle='--', alpha=0.6)
+    # plt.tight_layout()
+    # plt.savefig('imgs/grouped_runtimes.png')
+    # plt.show()
 
     starting_states = [0]
     brick_layouts = [constants.PYRAMID_LAYOUT, constants.INVERTED_PYRAMID_LAYOUT, constants.RECTANGLE_LAYOUT]
@@ -334,6 +339,7 @@ if __name__ == "__main__":
     for starting_state in starting_states:
         for brick_layout in brick_layouts:
             elapsed_time = run_monte_carlo(
+                0.01,
                 10000,
                 20000,
                 brick_layout,

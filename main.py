@@ -1,4 +1,5 @@
 import pygame
+
 import constants
 from constants import ROWS_RECTANGLE, ROWS_PYRAMID, ROWS_INVERTED_PYRAMID
 from game import Game
@@ -6,8 +7,9 @@ from game import Game
 # --- Pygame Initialization ---
 pygame.init()
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
-pygame.display.set_caption("Breakout Game") # Changed title for basic game
+pygame.display.set_caption("Breakout Game")  # Changed title for basic game
 clock = pygame.time.Clock()
+
 
 # --- Main Game Loop ---
 
@@ -25,7 +27,8 @@ def main_game_loop():
     elif constants.BRICK_LAYOUT == "inverted_pyramid":
         num_bricks_config = {"rows": ROWS_INVERTED_PYRAMID, "cols": constants.BRICK_COLUMNS}
 
-    print(f"Loading layout: {constants.BRICK_LAYOUT} with {num_bricks_config['rows']} rows, {num_bricks_config['cols']} cols")
+    print(
+        f"Loading layout: {constants.BRICK_LAYOUT} with {num_bricks_config['rows']} rows, {num_bricks_config['cols']} cols")
     game.create_bricks_layout(
         constants.BRICK_LAYOUT,
         num_rows=num_bricks_config['rows'],
@@ -51,7 +54,7 @@ def main_game_loop():
             running = False
         game.update()
         game.draw()
-        clock.tick(30) # Limit frame rate to 30 FPS
+        clock.tick(30)  # Limit frame rate to 30 FPS
 
     pygame.quit()
     print("Pygame exited.")
@@ -59,4 +62,3 @@ def main_game_loop():
 
 if __name__ == "__main__":
     main_game_loop()
-
